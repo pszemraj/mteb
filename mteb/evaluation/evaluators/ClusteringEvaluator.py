@@ -31,7 +31,9 @@ class ClusteringEvaluator(Evaluator):
         self.batch_size = batch_size
 
     def __call__(self, model):
-        logger.info(f"Encoding {len(self.sentences)} sentences...")
+        logger.info(
+            f"Encoding {len(self.sentences)} texts, batch_size={self.batch_size}..."
+        )
         corpus_embeddings = np.asarray(
             model.encode(self.sentences, batch_size=self.batch_size)
         )
