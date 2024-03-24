@@ -244,6 +244,7 @@ class MTEB:
         eval_splits=None,
         overwrite_results=False,
         raise_error: bool = True,
+        batch_size: int = 32,
         disable_autocast: bool = False,
         **kwargs,
     ):
@@ -263,6 +264,10 @@ class MTEB:
             Folder where the results will be saved
         raise_error: bool
             Whether to raise an error if an exception occurs during evaluation.
+        batch_size: int
+            Batch size to use for evaluation, default is 32
+        disable_autocast: bool
+            Whether to disable autocast during evaluation, default is False
         :return: Returns a dictionary of task names and corresponding metrics results.
         """
         # Set logging
@@ -333,7 +338,11 @@ class MTEB:
                             enable_mem_efficient=False,
                         ):
                             results = task.evaluate(
-                                model, split, output_folder=output_folder, **kwargs
+                                model,
+                                split,
+                                batch_size=batch_size,
+                                output_folder=output_folder,
+                                **kwargs,
                             )
                     tock = time()
                     logger.info(

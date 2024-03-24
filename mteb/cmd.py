@@ -185,6 +185,7 @@ def main():
         verbosity=args.verbosity,
         output_folder=args.output_folder,
         eval_splits=args.eval_splits,
+        batch_size=args.batch_size,
     )
 
     _save_model_metadata(model, args.model, Path(args.output_folder))
