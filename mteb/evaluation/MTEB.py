@@ -11,7 +11,9 @@ from time import time
 from typing import List, Union
 
 import datasets
+import torch
 from evaluators.utils import check_ampere_gpu
+from transformers.utils import is_torch_bf16_gpu_available
 
 from ..abstasks import *
 from ..abstasks import AbsTask, LangMapping
@@ -242,6 +244,7 @@ class MTEB:
         eval_splits=None,
         overwrite_results=False,
         raise_error: bool = True,
+        disable_autocast: bool = False,
         **kwargs,
     ):
         """
@@ -312,10 +315,26 @@ class MTEB:
                     "mteb_dataset_name": task.metadata_dict["name"],
                 }
                 for split in task_eval_splits:
+                    torch.cuda.empty_cache()
+
                     tick = time()
-                    results = task.evaluate(
-                        model, split, output_folder=output_folder, **kwargs
-                    )
+                    with torch.autocast(
+                        device_type="cuda",
+                        dtype=(
+                            torch.bfloat16
+                            if is_torch_bf16_gpu_available()
+                            else torch.float16
+                        ),
+                        enabled=not disable_autocast,
+                    ):
+                        with torch.backends.cuda.sdp_kernel(
+                            enable_flash=True,
+                            enable_math=False,
+                            enable_mem_efficient=False,
+                        ):
+                            results = task.evaluate(
+                                model, split, output_folder=output_folder, **kwargs
+                            )
                     tock = time()
                     logger.info(
                         f"Evaluation for {task.metadata_dict['name']} on {split} took {tock - tick:.2f} seconds"
