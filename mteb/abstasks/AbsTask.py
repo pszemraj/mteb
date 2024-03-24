@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 import datasets
 import numpy as np
 import torch
+import os
 
 
 class AbsTask(ABC):
@@ -24,7 +25,7 @@ class AbsTask(ABC):
         torch.manual_seed(self.seed)
         torch.cuda.manual_seed_all(self.seed)
 
-    def load_data(self, max_hard_retries: int = 3, **kwargs):
+    def load_data(self, max_hard_retries: int = 3, num_proc: int = None, **kwargs):
         """
         Load dataset from HuggingFace hub
 
@@ -33,7 +34,9 @@ class AbsTask(ABC):
         if self.data_loaded:
             return
 
-        download_config = datasets.DownloadConfig(max_retries=5)
+        download_config = datasets.DownloadConfig(
+            max_retries=5, num_proc=os.cpu_count() if num_proc is None else num_proc
+        )
 
         fail_count = 0
         while True:
