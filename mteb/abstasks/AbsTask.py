@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import random
+import time
+import warnings
 from abc import ABC, abstractmethod
 
 import datasets
@@ -22,21 +24,38 @@ class AbsTask(ABC):
         torch.manual_seed(self.seed)
         torch.cuda.manual_seed_all(self.seed)
 
-    def load_data(self, **kwargs):
+    def load_data(self, max_hard_retries: int = 3, **kwargs):
         """
         Load dataset from HuggingFace hub
+
+        :param max_hard_retries: Number of retries in case of connection error
         """
         if self.data_loaded:
             return
 
-        # TODO: add split argument
         download_config = datasets.DownloadConfig(max_retries=5)
-        self.dataset = datasets.load_dataset(
-            self.metadata_dict["hf_hub_name"],
-            revision=self.metadata_dict.get("revision", None),
-            download_config=download_config,
-        )
-        self.data_loaded = True
+
+        fail_count = 0
+        while True:
+            try:
+                # TODO: add split argument
+                self.dataset = datasets.load_dataset(
+                    self.metadata_dict["hf_hub_name"],
+                    revision=self.metadata_dict.get("revision", None),
+                    download_config=download_config,
+                )
+                self.data_loaded = True
+                break
+            except ConnectionError as e:
+                fail_count += 1
+                self.data_loaded = False
+                if fail_count > max_hard_retries:
+                    raise e
+                _wait_delay = random.SystemRandom().randint(5, 10)
+                warnings.warn(
+                    f"ConnectionError: {e}. Retrying in {_wait_delay} seconds."
+                )
+                time.sleep(_wait_delay)
 
     @property
     @abstractmethod
