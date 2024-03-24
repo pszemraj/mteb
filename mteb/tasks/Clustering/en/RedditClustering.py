@@ -16,7 +16,7 @@ class RedditClustering(AbsTaskClustering):
         eval_splits=["test"],
         eval_langs=["en"],
         main_score="v_measure",
-        revision="385e3cb46b4cfa89021f56c4380204149d0efe33",
+        revision="24640382cdbf8abc73003fb0fa6d111a705499eb",
         date=None,
         form=None,
         domains=None,
