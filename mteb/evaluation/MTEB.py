@@ -12,12 +12,12 @@ from typing import List, Union
 
 import datasets
 import torch
-from evaluators.utils import check_ampere_gpu
 from transformers.utils import is_torch_bf16_gpu_available
 
 from ..abstasks import *
 from ..abstasks import AbsTask, LangMapping
 from ..tasks import *
+from .evaluators.utils import check_ampere_gpu
 
 logger = logging.getLogger(__name__)
 
