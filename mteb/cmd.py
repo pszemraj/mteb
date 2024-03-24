@@ -44,7 +44,9 @@ def _save_model_metadata(
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
 
     parser.add_argument(
         "-m",
@@ -138,7 +140,12 @@ def main():
         default=None,
         help="Number of sentences to use for each corpus chunk. If None, a convenient number is suggested",
     )
-
+    parser.add_argument(
+        "--disable_autocast",
+        action="store_true",
+        default=False,
+        help="Disable autocast for evaluation",
+    )
     ## display tasks
     parser.add_argument(
         "--available_tasks",
@@ -186,6 +193,7 @@ def main():
         output_folder=args.output_folder,
         eval_splits=args.eval_splits,
         batch_size=args.batch_size,
+        disable_autocast=args.disable_autocast,
     )
 
     _save_model_metadata(model, args.model, Path(args.output_folder))
