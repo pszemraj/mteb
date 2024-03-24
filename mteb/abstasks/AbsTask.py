@@ -30,9 +30,11 @@ class AbsTask(ABC):
             return
 
         # TODO: add split argument
+        download_config = datasets.DownloadConfig(max_retries=5)
         self.dataset = datasets.load_dataset(
             self.metadata_dict["hf_hub_name"],
             revision=self.metadata_dict.get("revision", None),
+            download_config=download_config,
         )
         self.data_loaded = True
 
