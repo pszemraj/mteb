@@ -11,6 +11,7 @@ from time import time
 from typing import List, Union
 
 import datasets
+from evaluators.utils import check_ampere_gpu
 
 from ..abstasks import *
 from ..abstasks import AbsTask, LangMapping
@@ -28,6 +29,7 @@ class MTEB:
         tasks: List[Union[str, AbsTask]] = None,
         version=None,
         err_logs_path="error_logs.txt",
+        auto_tf32: bool = True,
         **kwargs,
     ):
         """
@@ -56,6 +58,8 @@ class MTEB:
         err_logs_path: str / None
             Path to save error logs
         """
+        if auto_tf32:
+            check_ampere_gpu()
 
         if tasks is not None:
             self._tasks = tasks
