@@ -146,6 +146,12 @@ def main():
         default=False,
         help="Disable autocast for evaluation",
     )
+    parser.add_argument(
+        "--no_raise_errors",
+        action="store_true",
+        default=False,
+        help="Disable raising errors for evaluation",
+    )
     ## display tasks
     parser.add_argument(
         "--available_tasks",
@@ -194,6 +200,7 @@ def main():
         eval_splits=args.eval_splits,
         batch_size=args.batch_size,
         disable_autocast=args.disable_autocast,
+        raise_error=not args.no_raise_errors,
     )
 
     _save_model_metadata(model, args.model, Path(args.output_folder))
